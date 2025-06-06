@@ -1,0 +1,108 @@
+<div class="container mx-auto p-6 animate__animated animate__fadeIn">
+  <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center flex items-center justify-center">
+    <i class="fas fa-wallet mr-2 text-green-600"></i>Select Recharge Plan
+  </h2>
+
+  <div *ngIf="subscriber" class="mb-6 card animate-slideUp">
+    <p class="text-lg text-gray-700 flex items-center">
+      <i class="fas fa-user mr-2 text-green-600"></i>
+      <span><strong>{{ subscriber.name }}</strong> ({{ subscriber.mobileNumber }})</span>
+    </p>
+  </div>
+
+  <form [formGroup]="rechargeForm" (ngSubmit)="onSubmit()" class="card max-w-lg mx-auto animate-slideUp space-y-6">
+    <!-- Plan Selection -->
+    <div>
+      <label for="planId" class="block text-sm font-medium text-gray-700 flex items-center">
+        <i class="fas fa-list mr-2 text-green-600"></i>Choose a Plan
+      </label>
+      <select id="planId" formControlName="planId" class="mt-1 block w-full px-4 py-3 border rounded-lg focus:ring-green-500">
+        <option value="" disabled>Select a plan</option>
+        <option *ngFor="let plan of plans" [value]="plan.id">
+          {{ plan.name }} - ₹{{ plan.price }} ({{ plan.validityDays }} days)
+        </option>
+      </select>
+      <p *ngIf="rechargeForm.get('planId')?.touched && rechargeForm.get('planId')?.hasError('required')" class="text-red-500 text-sm mt-1">Plan is required</p>
+    </div>
+
+    <!-- Payment Method -->
+    <div>
+      <label for="paymentMethod" class="block text-sm font-medium text-gray-700 flex items-center">
+        <i class="fas fa-credit-card mr-2 text-green-600"></i>Payment Method
+      </label>
+      <select id="paymentMethod" formControlName="paymentMethod" class="mt-1 block w-full px-4 py-3 border rounded-lg focus:ring-green-500">
+        <option value="" disabled>Select payment method</option>
+        <option value="UPI">UPI</option>
+        <option value="Card">Card</option>
+      </select>
+      <p *ngIf="rechargeForm.get('paymentMethod')?.touched && rechargeForm.get('paymentMethod')?.hasError('required')" class="text-red-500 text-sm mt-1">Payment method is required</p>
+    </div>
+
+    <!-- UPI Details -->
+    <div *ngIf="rechargeForm.get('paymentMethod')?.value === 'UPI'">
+      <label for="paymentDetails" class="block text-sm font-medium text-gray-700 flex items-center">
+        <i class="fas fa-qrcode mr-2 text-green-600"></i>UPI ID
+      </label>
+      <input id="paymentDetails" type="text" formControlName="paymentDetails" placeholder="e.g., user@upi"
+        class="mt-1 block w-full px-4 py-3 border rounded-lg focus:ring-green-500" />
+      <p *ngIf="rechargeForm.get('paymentDetails')?.touched && rechargeForm.get('paymentDetails')?.hasError('required')" class="text-red-500 text-sm mt-1">UPI ID is required</p>
+      <p *ngIf="rechargeForm.get('paymentDetails')?.touched && rechargeForm.get('paymentDetails')?.hasError('pattern')" class="text-red-500 text-sm mt-1">Invalid UPI ID</p>
+    </div>
+
+    <!-- Card Payment Fields -->
+    <div *ngIf="rechargeForm.get('paymentMethod')?.value === 'Card'" class="space-y-4">
+      <!-- Card Number -->
+      <div>
+        <label for="cardNumber" class="block text-sm font-medium text-gray-700 flex items-center">
+          <i class="fas fa-credit-card mr-2 text-green-600"></i>Card Number
+        </label>
+        <input id="cardNumber" type="text" formControlName="cardNumber" maxlength="16" placeholder="1234567812345678"
+          class="mt-1 block w-full px-4 py-3 border rounded-lg focus:ring-green-500" />
+        <p *ngIf="rechargeForm.get('cardNumber')?.touched && rechargeForm.get('cardNumber')?.hasError('required')" class="text-red-500 text-sm mt-1">Card number is required</p>
+        <p *ngIf="rechargeForm.get('cardNumber')?.touched && rechargeForm.get('cardNumber')?.hasError('pattern')" class="text-red-500 text-sm mt-1">Invalid card number</p>
+      </div>
+
+      <!-- Expiry and CVV -->
+      <div class="flex space-x-4">
+        <div class="w-1/2">
+          <label for="expiry" class="block text-sm font-medium text-gray-700 flex items-center">
+            <i class="fas fa-calendar mr-2 text-green-600"></i>Expiry (MM/YY)
+          </label>
+          <input id="expiry" type="text" formControlName="expiry" maxlength="5" placeholder="MM/YY"
+            class="mt-1 block w-full px-4 py-3 border rounded-lg focus:ring-green-500" />
+          <p *ngIf="rechargeForm.get('expiry')?.touched && rechargeForm.get('expiry')?.hasError('required')" class="text-red-500 text-sm mt-1">Expiry is required</p>
+          <p *ngIf="rechargeForm.get('expiry')?.touched && rechargeForm.get('expiry')?.hasError('pattern')" class="text-red-500 text-sm mt-1">Invalid expiry</p>
+        </div>
+
+        <div class="w-1/2">
+          <label for="cvv" class="block text-sm font-medium text-gray-700 flex items-center">
+            <i class="fas fa-lock mr-2 text-green-600"></i>CVV
+          </label>
+          <input id="cvv" type="text" formControlName="cvv" maxlength="3" placeholder="123"
+            class="mt-1 block w-full px-4 py-3 border rounded-lg focus:ring-green-500" />
+          <p *ngIf="rechargeForm.get('cvv')?.touched && rechargeForm.get('cvv')?.hasError('required')" class="text-red-500 text-sm mt-1">CVV is required</p>
+          <p *ngIf="rechargeForm.get('cvv')?.touched && rechargeForm.get('cvv')?.hasError('pattern')" class="text-red-500 text-sm mt-1">Invalid CVV</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit Button -->
+    <button 
+      type="submit" 
+      [disabled]="!isInitialized || !plans.length || rechargeForm.invalid || successMessage" 
+      class="bg-green-600 hover:bg-green-700 text-white font-semibold w-full py-3 rounded disabled:bg-gray-400 disabled:cursor-not-allowed transition duration-300">
+      <i class="fas fa-paper-plane mr-2"></i>Confirm Recharge
+    </button>
+
+    <!-- Messages -->
+    <p *ngIf="errorMessage" class="text-red-500 text-center mt-4 animate__animated animate__pulse">{{ errorMessage }}</p>
+    <div *ngIf="successMessage" class="text-green-500 text-center mt-4 animate__animated animate__pulse">
+      <div>
+        Thank You! <br />Your Recharge was successful! 🙂<br />{{ successMessage }}
+      </div>
+      <button (click)="goHome()" class="bg-green-600 text-white px-6 py-2 rounded-lg mt-4">
+        Go to Home
+      </button>
+    </div>
+  </form>
+</div>

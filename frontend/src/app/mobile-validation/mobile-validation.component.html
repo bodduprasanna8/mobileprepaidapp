@@ -1,0 +1,65 @@
+<div *ngIf="!showRegistration" class="flex items-center justify-center min-h-screen bg-gradient-to-r from-green-600 to-green-100 animate__animated animate__fadeIn">
+  <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md card animate-slideIn">
+    <h2 class="text-3xl font-bold mb-6 text-center text-gray-800 flex items-center justify-center">
+      <i class="fas fa-mobile-alt mr-2 text-green-600"></i>Validate Mobile Number
+    </h2>
+    <form [formGroup]="validationForm" (ngSubmit)="onSubmit()" class="space-y-6">
+      <div>
+        <label for="mobileNumber" class="block text-sm font-medium text-gray-700 flex items-center">
+          <i class="fas fa-phone fa-rotate-90 mr-2 text-green-600"></i>Mobile Number
+        </label>
+        <input id="mobileNumber" type="text" formControlName="mobileNumber" maxlength="10"
+          class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-300"
+          required>
+        <p *ngIf="validationForm.get('mobileNumber')?.hasError('required') && validationForm.get('mobileNumber')?.touched"
+          class="text-red-500 text-sm mt-1 animate__animated animate__pulse">Mobile number is required</p>
+        <p *ngIf="validationForm.get('mobileNumber')?.hasError('pattern') && validationForm.get('mobileNumber')?.touched"
+          class="text-red-500 text-sm mt-1 animate__animated animate__pulse">Enter a valid 10-digit number</p>
+      </div>
+      <button type="submit" [disabled]="validationForm.invalid"
+        class="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 hover:shadow-lg transform transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center">
+        <i class="fas fa-check mr-2"></i>Validate
+      </button>
+      <p *ngIf="errorMessage" class="text-red-500 text-center mt-4 animate__animated animate__pulse">{{ errorMessage }}</p>
+    </form>
+  </div>
+</div>
+
+<!-- Registration Form -->
+<div *ngIf="showRegistration" class="flex items-center justify-center min-h-screen bg-gradient-to-r from-green-600 to-green-100 animate__animated animate__fadeIn">
+  <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md card animate-slideIn">
+    <h2 class="text-3xl font-bold mb-6 text-center text-gray-800 flex items-center justify-center">
+      <i class="fas fa-user-plus mr-2 text-green-600"></i>Register New Subscriber
+    </h2>
+    <form [formGroup]="registrationForm" (ngSubmit)="onRegister()" class="space-y-6">
+      <div>
+        <label for="name" class="block text-sm font-medium text-gray-700 flex items-center">
+          <i class="fas fa-user mr-2 text-green-600"></i>Name
+        </label>
+        <input id="name" type="text" formControlName="name" maxlength="20"
+          class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-300"
+          required>
+      </div>
+      <div>
+        <label for="mobileNumber" class="block text-sm font-medium text-gray-700 flex items-center">
+          <i class="fas fa-phone fa-rotate-90 mr-2 text-green-600"></i>Mobile Number
+        </label>
+        <input id="mobileNumber" type="text" formControlName="mobileNumber" maxlength="10"
+          class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm bg-gray-100 transition duration-300">
+      </div>
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-700 flex items-center">
+          <i class="fas fa-envelope mr-2 text-green-600"></i>Email
+        </label>
+        <input id="email" type="email" formControlName="email"
+          class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-300"
+          required>
+      </div>
+      <button type="submit" [disabled]="registrationForm.invalid"
+        class="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 hover:shadow-lg transform transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center">
+        <i class="fas fa-user-plus mr-2"></i>Register
+      </button>
+      <p *ngIf="errorMessage" class="text-red-500 text-center mt-4 animate__animated animate__pulse">{{ errorMessage }}</p>
+    </form>
+  </div>
+</div>

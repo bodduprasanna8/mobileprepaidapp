@@ -1,0 +1,155 @@
+<div class="container mx-auto p-6 animate__animated animate__fadeIn">
+  <h2 class="text-3xl font-bold mb-6 text-center text-gray-800 flex items-center justify-center">
+    <i class="fas fa-tachometer-alt mr-2 text-green-600"></i>Admin Dashboard
+  </h2>
+
+  <!-- Expiring Subscribers -->
+  <div class="bg-white p-6 rounded-xl shadow-2xl mb-8 card animate-slideIn">
+    <h3 class="text-xl font-semibold mb-4 text-gray-800 flex items-center">
+      <i class="fas fa-users mr-2 text-green-600"></i>Expiring Subscribers
+    </h3>
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse">
+        <thead>
+          <tr class="bg-green-100">
+            <th class="border px-4 py-3 text-left text-gray-700"><i class="fas fa-phone fa-rotate-90 mr-1"></i>Mobile Number</th>
+            <th class="border px-4 py-3 text-left text-gray-700"><i class="fas fa-user mr-1"></i>Name</th>
+            <th class="border px-4 py-3 text-left text-gray-700"><i class="fas fa-calendar-alt mr-1"></i>Plan Expiry</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let subscriber of expiringSubscribers" class="hover:bg-green-50 transition duration-300">
+            <td class="border px-4 py-3">{{ subscriber.mobileNumber }}</td>
+            <td class="border px-4 py-3">{{ subscriber.name }}</td>
+            <td class="border px-4 py-3">{{ subscriber.planExpiry | date }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Recharge History -->
+  <div class="bg-white p-6 rounded-xl shadow-2xl mb-8 card animate-slideIn">
+    <h3 class="text-xl font-semibold mb-4 text-gray-800 flex items-center">
+      <i class="fas fa-history mr-2 text-green-600"></i>Recharge History
+    </h3>
+    <form [formGroup]="historyForm" (ngSubmit)="onHistorySubmit()" class="mb-6 max-w-md space-y-4">
+      <div>
+        <label for="mobileNumber" class="block text-sm font-medium text-gray-700 flex items-center">
+          <i class="fas fa-phone mr-2 text-green-600 fa-rotate-90"></i>Mobile Number
+        </label>
+        <input id="mobileNumber" type="text" formControlName="mobileNumber" maxlength="10"
+          class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-300" required>
+        <p *ngIf="historyForm.get('mobileNumber')?.hasError('required') && historyForm.get('mobileNumber')?.touched"
+          class="text-red-500 text-sm mt-1 animate__animated animate__pulse">Mobile number is required</p>
+        <p *ngIf="historyForm.get('mobileNumber')?.hasError('pattern') && historyForm.get('mobileNumber')?.touched"
+          class="text-red-500 text-sm mt-1 animate__animated animate__pulse">Enter a valid 10-digit number</p>
+      </div>
+      <button type="submit" [disabled]="historyForm.invalid"
+        class="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 hover:shadow-lg transform transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center">
+        <i class="fas fa-search mr-2"></i>View History
+      </button>
+    </form>
+    <div class="overflow-x-auto" *ngIf="rechargeHistory.length">
+      <table class="w-full border-collapse">
+        <thead>
+          <tr class="bg-green-100">
+            <th class="border px-4 py-3 text-left text-gray-700"><i class="fas fa-list mr-1"></i>Plan Name</th>
+            <th class="border px-4 py-3 text-left text-gray-700"><i class="fas fa-rupee-sign mr-1"></i>Amount</th>
+            <th class="border px-4 py-3 text-left text-gray-700"><i class="fas fa-calendar-alt mr-1"></i>Recharge Date</th>
+            <th class="border px-4 py-3 text-left text-gray-700"><i class="fas fa-info-circle mr-1"></i>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let recharge of rechargeHistory" class="hover:bg-green-50 transition duration-300">
+            <td class="border px-4 py-3">{{ recharge.plan.name }}</td>
+            <td class="border px-4 py-3">₹{{ recharge.amount }}</td>
+            <td class="border px-4 py-3">{{ recharge.rechargeDate | date }}</td>
+            <td class="border px-4 py-3">{{ recharge.status }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p *ngIf="errorMessage" class="text-red-500 text-center mt-4 animate__animated animate__pulse">{{ errorMessage }}</p>
+  </div>
+
+  <!-- Plan Management -->
+  <div class="bg-white p-6 rounded-xl shadow-2xl mb-8 card animate-slideIn">
+    <h3 class="text-xl font-semibold mb-4 text-gray-800 flex items-center">
+      <i class="fas fa-cogs mr-2 text-green-600"></i>Plan Management
+    </h3>
+    <form [formGroup]="planForm" (ngSubmit)="onAddOrUpdatePlan()" class="space-y-4 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <input formControlName="name" type="text" placeholder="Plan Name"
+          class="border px-4 py-2 rounded-lg focus:ring-2 focus:ring-green-500 w-full" />
+        <input formControlName="price" type="number" placeholder="Price"
+          class="border px-4 py-2 rounded-lg focus:ring-2 focus:ring-green-500 w-full" />
+        <input formControlName="validityDays" type="number" placeholder="Validity Days"
+          class="border px-4 py-2 rounded-lg focus:ring-2 focus:ring-green-500 w-full" />
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <select formControlName="category"
+          class="border px-4 py-2 rounded-lg focus:ring-2 focus:ring-green-500 w-full">
+          <option value="">Category</option>
+          <option *ngFor="let cat of categories" [value]="cat.value">{{cat.label}}</option>
+        </select>
+        <input formControlName="dataPerDay" type="text" placeholder="Data Per Day"
+          class="border px-4 py-2 rounded-lg focus:ring-2 focus:ring-green-500 w-full" />
+        <input formControlName="calls" type="text" placeholder="Calls"
+          class="border px-4 py-2 rounded-lg focus:ring-2 focus:ring-green-500 w-full" />
+        <input formControlName="sms" type="text" placeholder="SMS"
+          class="border px-4 py-2 rounded-lg focus:ring-2 focus:ring-green-500 w-full" />
+      </div>
+      <div class="flex justify-end">
+        <button type="submit"
+          class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition duration-300 flex items-center">
+          <i class="fas" [ngClass]="isEditing ? 'fa-save' : 'fa-plus-circle'"></i>
+          <span class="ml-2">{{ isEditing ? 'Update Plan' : 'Add Plan' }}</span>
+        </button>
+        <button *ngIf="isEditing" type="button" (click)="resetPlanForm()"
+          class="ml-4 bg-gray-400 text-white px-6 py-2 rounded-lg hover:bg-gray-500 transition duration-300 flex items-center">
+          <i class="fas fa-times-circle"></i><span class="ml-2">Cancel</span>
+        </button>
+      </div>
+    </form>
+    <div class="overflow-x-auto" *ngIf="plans.length">
+      <table class="w-full border-collapse">
+        <thead>
+          <tr class="bg-green-100">
+            <th class="border px-4 py-3 text-left text-gray-700">Name</th>
+            <th class="border px-4 py-3 text-left text-gray-700">Price</th>
+            <th class="border px-4 py-3 text-left text-gray-700">Validity</th>
+            <th class="border px-4 py-3 text-left text-gray-700">Category</th>
+            <th class="border px-4 py-3 text-left text-gray-700">Data/Day</th>
+            <th class="border px-4 py-3 text-left text-gray-700">Calls</th>
+            <th class="border px-4 py-3 text-left text-gray-700">SMS</th>
+            <th class="border px-4 py-3 text-left text-gray-700">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let plan of plans" class="hover:bg-green-50 transition duration-300">
+            <td class="border px-4 py-3">{{ plan.name }}</td>
+            <td class="border px-4 py-3">₹{{ plan.price }}</td>
+            <td class="border px-4 py-3">{{ plan.validityDays  }}</td>
+            <td class="border px-4 py-3">{{ plan.category }}</td>
+            <td class="border px-4 py-3">{{ plan.dataPerDay }}</td>
+            <td class="border px-4 py-3">{{ plan.calls }}</td>
+            <td class="border px-4 py-3">{{ plan.sms }}</td>
+            <td class="border px-4 py-3 space-x-2">
+              <button (click)="onEditPlan(plan)"
+                class="bg-yellow-400 text-white px-3 py-1 rounded hover:bg-yellow-500 transition duration-200">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button (click)="onDeletePlan(plan.id)"
+                class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition duration-200">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p *ngIf="successMessage" class="text-green-600 text-center mt-4 animate__animated animate__fadeIn">{{ successMessage }}</p>
+    <p *ngIf="errorMessage" class="text-red-500 text-center mt-4 animate__animated animate__pulse">{{ errorMessage }}</p>
+  </div>
+</div>
